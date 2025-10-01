@@ -1,0 +1,13 @@
+// TEMPORARY FIRESTORE RULES - Use only for testing
+// Copy and paste this into Firebase Console > Firestore > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+
+// After testing works, replace with the secure rules from firebase.rules

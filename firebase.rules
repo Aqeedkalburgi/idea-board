@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ideas/{ideaId} {
+      allow read: if true;
+
+      // Create: only authenticated users, text <= 280, upvotes must start at 0
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll(['text','upvotes','createdAt'])
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 280
+        && request.resource.data.upvotes == 0;
+
+      // Update: only authenticated users, only allow +1 increment to upvotes and disallow changing text/createdAt
+      allow update: if request.auth != null
+        && request.resource.data.text == resource.data.text
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.upvotes == resource.data.upvotes + 1
+        && request.resource.data.upvotes is int
+        && request.resource.data.upvotes >= 0;
+
+      // Delete: forbidden
+      allow delete: if false;
+    }
+  }
+}
